@@ -1,0 +1,313 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>App.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">demo</a> &gt; <a href="index.source.html" class="el_package">com.example</a> &gt; <span class="el_source">App.java</span></div><h1>App.java</h1><pre class="source lang-java linenums">package com.example;
+
+import java.util.*;
+import java.util.Timer;
+import javax.sound.sampled.*;
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
+import java.io.*;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
+import com.github.twitch4j.*;
+import com.github.twitch4j.helix.domain.CustomRewardList;
+import com.github.twitch4j.helix.domain.UserList;
+import com.github.twitch4j.pubsub.events.RewardRedeemedEvent;
+
+<span class="nc" id="L21">public class App {</span>
+
+<span class="nc" id="L23">    public static Dimension size = Toolkit.getDefaultToolkit().getScreenSize();</span>
+<span class="nc" id="L24">    public static int w = (int)size.getWidth();</span>
+<span class="nc" id="L25">    public static int h = (int)size.getHeight();</span>
+
+<span class="nc" id="L27">    public static Canvas can = new Canvas(w, h);</span>
+<span class="nc" id="L28">    public static JFrame f = new JFrame();</span>
+<span class="nc" id="L29">    public static JFrame g = new JFrame();</span>
+<span class="nc" id="L30">    public static JTextField textField1 = new JTextField(25);</span>
+
+<span class="nc" id="L32">    public static float total = 2990;</span>
+<span class="nc" id="L33">    public static float period = 3;</span>
+<span class="nc" id="L34">    public static int runCount = 0;</span>
+<span class="nc" id="L35">    public static boolean flashToggle = false;</span>
+<span class="nc" id="L36">    public static boolean buttonPressed = false;</span>
+    public static JComponent afterImage;
+
+<span class="nc" id="L39">    public static int tillNext = 60000;</span>
+<span class="nc" id="L40">    public static int lowerBound = 60000;</span>
+<span class="nc" id="L41">    public static int upperBound = 840000;</span>
+
+<span class="nc" id="L43">    public static Timer timer = new Timer();</span>
+<span class="nc" id="L44">    public static Random rand = new Random();</span>
+
+<span class="nc" id="L46">    public static String channelName = &quot;&quot;;</span>
+<span class="nc" id="L47">    public static String OAuthToken = &quot;&quot;;</span>
+<span class="nc" id="L48">    public static String channelID = &quot;&quot;;</span>
+    public static CustomRewardList rewardList;
+<span class="nc" id="L50">    public static String flashbangID = &quot;&quot;;</span>
+<span class="nc" id="L51">    public static boolean fileCreated = false;</span>
+
+    public static void main(String[] args) throws IOException
+    {
+<span class="nc" id="L55">        JPanel twitchPanel = new JPanel();</span>
+<span class="nc" id="L56">        JPanel localPanel = new JPanel();</span>
+<span class="nc" id="L57">        JLabel label = new JLabel();</span>
+<span class="nc" id="L58">        JButton button = new JButton();</span>
+        
+<span class="nc" id="L60">        Container pane = g.getContentPane();</span>
+
+        
+<span class="nc" id="L63">        Files.createDirectories(Paths.get(System.getenv(&quot;APPDATA&quot;) + &quot;\\Flashbang&quot;));</span>
+<span class="nc" id="L64">        File fi = new File(System.getenv(&quot;APPDATA&quot;) + &quot;\\Flashbang\\properties.txt&quot;);</span>
+<span class="nc" id="L65">        fileCreated = fi.createNewFile();</span>
+<span class="nc bnc" id="L66" title="All 2 branches missed.">        if(!fileCreated)</span>
+        {
+<span class="nc" id="L68">            FileReader file = new FileReader(fi);</span>
+<span class="nc" id="L69">            BufferedReader in = new BufferedReader(file);</span>
+<span class="nc" id="L70">            String token = in.readLine();</span>
+<span class="nc bnc" id="L71" title="All 2 branches missed.">            if(token != &quot;&quot;)</span>
+            {
+<span class="nc" id="L73">                textField1.setText(token);</span>
+<span class="nc" id="L74">                fileCreated = true;</span>
+            }
+<span class="nc" id="L76">            in.close();</span>
+        }
+
+<span class="nc" id="L79">        pane.setLayout(new BorderLayout());</span>
+<span class="nc" id="L80">        twitchPanel.setLayout(new FlowLayout());</span>
+<span class="nc" id="L81">        localPanel.setLayout(new FlowLayout());</span>
+
+<span class="nc" id="L83">        twitchPanel.add(label);</span>
+<span class="nc" id="L84">        twitchPanel.add(textField1);</span>
+
+<span class="nc" id="L86">        localPanel.add(button);</span>
+
+<span class="nc" id="L88">        OAuth2Credential credentials = new OAuth2Credential</span>
+            (&quot;twitch&quot;, &quot;hl8584yn6jxdmrk618813xgymzq5ty&quot;);
+        
+<span class="nc" id="L91">        TwitchClient twitchClient = TwitchClientBuilder.builder()</span>
+<span class="nc" id="L92">            .withClientId(&quot;4ocquuv1wpfordfq04za5l7anqch0e&quot;)</span>
+<span class="nc" id="L93">            .withClientSecret(&quot;iewkws4xqp7anvnzfv5150pddysvx8&quot;)</span>
+<span class="nc" id="L94">            .withEnableHelix(true)</span>
+<span class="nc" id="L95">            .withEnablePubSub(true)</span>
+<span class="nc" id="L96">            .build();</span>
+        
+<span class="nc" id="L98">        label.setText(&quot;Enter your OAuth Token, then press Enter to start: &quot;);</span>
+<span class="nc" id="L99">        button.setText(&quot;Random Timer Only&quot;);</span>
+
+<span class="nc" id="L101">        button.addActionListener(new ActionListener()</span>
+<span class="nc" id="L102">        {</span>
+            @Override
+            public void actionPerformed(ActionEvent e)
+            {
+<span class="nc bnc" id="L106" title="All 2 branches missed.">                if(!buttonPressed)</span>
+                {
+                    //tillNext += rand.nextInt(upperBound);
+
+<span class="nc" id="L110">                    timer.cancel();</span>
+<span class="nc" id="L111">                    f.dispose();</span>
+
+<span class="nc" id="L113">                    f.setOpacity(1);</span>
+<span class="nc" id="L114">                    f.setSize(size);</span>
+<span class="nc" id="L115">                    f.setTitle(&quot;Flashbang&quot;);</span>
+<span class="nc" id="L116">                    f.add(can);</span>
+<span class="nc" id="L117">                    f.setAlwaysOnTop(true);</span>
+<span class="nc" id="L118">                    f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);</span>
+<span class="nc" id="L119">                    f.setExtendedState(JFrame.MAXIMIZED_BOTH); </span>
+<span class="nc" id="L120">                    f.setUndecorated(true);</span>
+
+<span class="nc" id="L122">                    Rectangle capture = new Rectangle(Toolkit.getDefaultToolkit().getScreenSize());</span>
+                    try
+                    {
+<span class="nc" id="L125">                        Robot r = new Robot();</span>
+<span class="nc" id="L126">                        BufferedImage Image = r.createScreenCapture(capture);</span>
+<span class="nc" id="L127">                        afterImage = new TransparentImage(Image);</span>
+                    }
+<span class="nc" id="L129">                    catch (AWTException e1)</span>
+                    {
+<span class="nc" id="L131">                        System.out.println(e1);</span>
+<span class="nc" id="L132">                    }</span>
+
+<span class="nc" id="L134">                    f.add(afterImage);</span>
+<span class="nc" id="L135">                    afterImage.setOpaque(false);</span>
+<span class="nc" id="L136">                    afterImage.setVisible(false);</span>
+<span class="nc" id="L137">                    f.setVisible(true);</span>
+<span class="nc" id="L138">                    flashToggle = true;</span>
+<span class="nc" id="L139">                    buttonPressed = true;</span>
+<span class="nc" id="L140">                    timer = new Timer();</span>
+<span class="nc" id="L141">                    startFlash();</span>
+<span class="nc" id="L142">                }</span>
+                else
+                {
+<span class="nc" id="L145">                    flashToggle = false;</span>
+<span class="nc" id="L146">                    buttonPressed = false;</span>
+<span class="nc" id="L147">                    timer.cancel();</span>
+<span class="nc" id="L148">                    f.dispose();</span>
+<span class="nc" id="L149">                    f.setOpacity(1);</span>
+                }
+<span class="nc" id="L151">            }</span>
+        });
+
+<span class="nc" id="L154">        textField1.addActionListener(new ActionListener()</span>
+<span class="nc" id="L155">        {</span>
+            @Override
+            public void actionPerformed(java.awt.event.ActionEvent e)
+            {
+<span class="nc" id="L159">                OAuthToken = textField1.getText();</span>
+
+<span class="nc bnc" id="L161" title="All 2 branches missed.">                if(fileCreated)</span>
+                {
+                    try
+                    {
+<span class="nc" id="L165">                        FileWriter file = new FileWriter(fi);</span>
+<span class="nc" id="L166">                        BufferedWriter out = new BufferedWriter(file);</span>
+<span class="nc" id="L167">                        out.write(OAuthToken, 0, OAuthToken.length());</span>
+<span class="nc" id="L168">                        out.close();</span>
+                    }
+<span class="nc" id="L170">                    catch (Exception exc)</span>
+                    {
+<span class="nc" id="L172">                        System.out.println(&quot;L Writer&quot;);</span>
+<span class="nc" id="L173">                    }</span>
+                    
+                }
+<span class="nc" id="L176">                UserList resultList = twitchClient.getHelix().getUsers(OAuthToken, null, null).execute();</span>
+<span class="nc" id="L177">                channelName = resultList.getUsers().get(0).getLogin();</span>
+<span class="nc" id="L178">                channelID = resultList.getUsers().get(0).getId();</span>
+
+<span class="nc" id="L180">                twitchClient.getPubSub().listenForChannelPointsRedemptionEvents(credentials, channelID);</span>
+<span class="nc" id="L181">                rewardList = twitchClient.getHelix().getCustomRewards(OAuthToken, channelID, null, null).execute();</span>
+<span class="nc" id="L182">                rewardList.getRewards().forEach(reward -&gt; </span>
+                {
+<span class="nc bnc" id="L184" title="All 2 branches missed.">                    if(reward.getTitle().toLowerCase().contains(&quot;flashbang&quot;))</span>
+<span class="nc" id="L185">                        flashbangID = reward.getId();</span>
+<span class="nc" id="L186">                });</span>
+
+<span class="nc" id="L188">                twitchClient.getEventManager().onEvent(RewardRedeemedEvent.class, new FlashbangConsumer&lt;RewardRedeemedEvent&gt;());</span>
+
+<span class="nc" id="L190">                tillNext += rand.nextInt(upperBound);</span>
+ 
+<span class="nc" id="L192">                timer.cancel();</span>
+<span class="nc" id="L193">                f.dispose();</span>
+
+<span class="nc" id="L195">                f.setOpacity(1);</span>
+<span class="nc" id="L196">                f.setSize(size);</span>
+<span class="nc" id="L197">                f.setTitle(&quot;Flashbang&quot;);</span>
+<span class="nc" id="L198">                f.add(can);</span>
+<span class="nc" id="L199">                f.setAlwaysOnTop(true);</span>
+<span class="nc" id="L200">                f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);</span>
+<span class="nc" id="L201">                f.setExtendedState(JFrame.MAXIMIZED_BOTH); </span>
+<span class="nc" id="L202">                f.setUndecorated(true);</span>
+
+<span class="nc" id="L204">                Rectangle capture = new Rectangle(Toolkit.getDefaultToolkit().getScreenSize());</span>
+                try
+                {
+<span class="nc" id="L207">                    Robot r = new Robot();</span>
+<span class="nc" id="L208">                    BufferedImage Image = r.createScreenCapture(capture);</span>
+<span class="nc" id="L209">                    afterImage = new TransparentImage(Image);</span>
+                }
+<span class="nc" id="L211">                catch (AWTException e1)</span>
+                {
+<span class="nc" id="L213">                    System.out.println(e1);</span>
+<span class="nc" id="L214">                }</span>
+
+<span class="nc" id="L216">                f.add(afterImage);</span>
+<span class="nc" id="L217">                afterImage.setOpaque(false);</span>
+<span class="nc" id="L218">                afterImage.setVisible(false);</span>
+<span class="nc" id="L219">                f.setVisible(true);</span>
+<span class="nc" id="L220">                flashToggle = true;</span>
+<span class="nc" id="L221">                timer = new Timer();</span>
+<span class="nc" id="L222">                startFlash();</span>
+<span class="nc" id="L223">            }</span>
+        });
+
+<span class="nc" id="L226">        localPanel.setSize(new Dimension((int)button.getPreferredSize().getWidth()*2, (int)button.getPreferredSize().getHeight()*2));</span>
+<span class="nc" id="L227">        twitchPanel.setSize(new Dimension((int)button.getPreferredSize().getWidth()*10, (int)button.getPreferredSize().getHeight()*2));</span>
+<span class="nc" id="L228">        g.setTitle(&quot;Flashbang Config&quot;);</span>
+<span class="nc" id="L229">        g.setBackground(Color.LIGHT_GRAY);</span>
+<span class="nc" id="L230">        pane.add(twitchPanel, BorderLayout.NORTH);</span>
+<span class="nc" id="L231">        pane.add(localPanel, BorderLayout.SOUTH);</span>
+<span class="nc" id="L232">        g.pack();</span>
+<span class="nc" id="L233">        g.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);</span>
+<span class="nc" id="L234">        g.setVisible(true);</span>
+<span class="nc" id="L235">    }</span>
+
+    public static void startFlash()
+    {
+<span class="nc" id="L239">        playSound(&quot;flashbang.wav&quot;);</span>
+<span class="nc" id="L240">        timer.scheduleAtFixedRate(new Helper(), 1880, 3);</span>
+<span class="nc" id="L241">    }</span>
+
+    public static synchronized void playSound(String soundFile) {
+        try {
+<span class="nc" id="L245">            Clip clip = AudioSystem.getClip();</span>
+<span class="nc" id="L246">            URL url = App.class.getResource(&quot;audio/&quot; + soundFile);</span>
+<span class="nc" id="L247">            AudioInputStream inputStream = AudioSystem.getAudioInputStream(url);</span>
+<span class="nc" id="L248">            clip.open(inputStream);</span>
+<span class="nc" id="L249">            clip.start();</span>
+<span class="nc" id="L250">        } catch (Exception e) {</span>
+<span class="nc" id="L251">            System.out.println(&quot;L&quot;);</span>
+<span class="nc" id="L252">        }</span>
+<span class="nc" id="L253">    }</span>
+
+<span class="nc" id="L255">    public static class Helper extends TimerTask</span>
+    {
+        public void run()
+        {
+<span class="nc bnc" id="L259" title="All 2 branches missed.">            if(flashToggle)</span>
+            {
+<span class="nc bnc" id="L261" title="All 2 branches missed.">                if(runCount == 2990/3)</span>
+                {
+<span class="nc" id="L263">                    f.setOpacity(0);</span>
+<span class="nc" id="L264">                    afterImage.setVisible(false);</span>
+<span class="nc" id="L265">                    timer.cancel();</span>
+<span class="nc" id="L266">                    runCount = 0;</span>
+<span class="nc" id="L267">                    f.setVisible(false);</span>
+<span class="nc" id="L268">                    flashToggle = false;</span>
+<span class="nc" id="L269">                    timer = new Timer();</span>
+<span class="nc" id="L270">                    timer.schedule(new Rerun(), tillNext);</span>
+                }
+                else
+                {
+<span class="nc" id="L274">                    afterImage.setVisible(true);</span>
+<span class="nc" id="L275">                    f.setOpacity(f.getOpacity() - (period / total));</span>
+<span class="nc" id="L276">                    runCount++;</span>
+                }
+            }
+<span class="nc" id="L279">        }</span>
+    }
+
+    private static class Rerun extends TimerTask
+    {
+        public void run()
+        {
+            //tillNext = lowerBound + rand.nextInt(upperBound);
+            //f.toFront();
+<span class="nc" id="L288">            f.remove(afterImage);</span>
+
+<span class="nc" id="L290">            Rectangle capture = new Rectangle(Toolkit.getDefaultToolkit().getScreenSize());</span>
+            try
+            {
+<span class="nc" id="L293">                Robot r = new Robot();</span>
+<span class="nc" id="L294">                BufferedImage Image = r.createScreenCapture(capture);</span>
+<span class="nc" id="L295">                afterImage = new TransparentImage(Image);</span>
+            }
+<span class="nc" id="L297">            catch (AWTException e1)</span>
+            {
+<span class="nc" id="L299">                System.out.println(e1);</span>
+<span class="nc" id="L300">            }</span>
+
+<span class="nc" id="L302">            playSound(&quot;flashbang.wav&quot;);</span>
+<span class="nc" id="L303">            f.add(afterImage);</span>
+<span class="nc" id="L304">            afterImage.setOpaque(false);</span>
+<span class="nc" id="L305">            afterImage.setVisible(false);</span>
+<span class="nc" id="L306">            f.setOpacity(1);</span>
+<span class="nc" id="L307">            f.setVisible(true);</span>
+<span class="nc" id="L308">            flashToggle = true;</span>
+<span class="nc" id="L309">            timer.scheduleAtFixedRate(new Helper(), 1880, 3);</span>
+<span class="nc" id="L310">        }</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.4.201905082037</span></div></body></html>
