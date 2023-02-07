@@ -9,7 +9,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.*;
-import java.net.URL;
+import java.net.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
@@ -115,11 +115,11 @@ public class App {
         // OAuth Dev Credentials
 
         OAuth2Credential credentials = new OAuth2Credential
-            ("twitch", "Your API Access Token");
+            ("twitch", "hl8584yn6jxdmrk618813xgymzq5ty");
         
         TwitchClient twitchClient = TwitchClientBuilder.builder()
-            .withClientId("Your Client ID")
-            .withClientSecret("Your Client Secret")
+            .withClientId("4ocquuv1wpfordfq04za5l7anqch0e")
+            .withClientSecret("iewkws4xqp7anvnzfv5150pddysvx8")
             .withEnableHelix(true)
             .withEnablePubSub(true)
             .build();
@@ -140,6 +140,7 @@ public class App {
                 if(!buttonPressed)
                 {
                     firstLaunch(false);
+                    button.setText("Cancel Flashbangs");
                 }
                 else
                 {
@@ -148,6 +149,7 @@ public class App {
                     timer.cancel();
                     f.dispose();
                     f.setOpacity(1);
+                    button.setText("Random Timer Only");
                 }
             }
         });
@@ -207,6 +209,7 @@ public class App {
                 // On redemption of the previously marked channel event, start the flashbang process
                 twitchClient.getEventManager().onEvent(RewardRedeemedEvent.class, new FlashbangConsumer<RewardRedeemedEvent>());
 
+                button.setText("Cancel Flashbangs");
                 firstLaunch(true);
             }
         });
@@ -245,7 +248,7 @@ public class App {
     {
         // Will generate random time until next flash using a normal distribution
         // Uses a mean of 7.5 minutes and standard deviation of 3
-        tillNext += rand.nextGaussian()*3+7.5;
+        tillNext = rand.nextGaussian()*3+7.5;
 
         // Dispose of any potential leftover objects
         timer.cancel();
@@ -313,7 +316,7 @@ public class App {
         {
             if(flashToggle)
             {
-                if(runCount == total/period)
+                if(runCount == (int)total/(int)period)
                 {
                     f.setOpacity(0);
                     afterImage.setVisible(false);
@@ -321,6 +324,7 @@ public class App {
                     runCount = 0;
                     f.setVisible(false);
                     flashToggle = false;
+                    System.out.println(tillNext);
                     timer = new Timer();
                     timer.schedule(new Rerun(), (long)(tillNext * 60000));
                 }
@@ -343,7 +347,7 @@ public class App {
         {
             if(flashToggle)
             {
-                if(runCount == total/period)
+                if(runCount == (int)total/(int)period)
                 {
                     f.setOpacity(0);
                     afterImage.setVisible(false);
