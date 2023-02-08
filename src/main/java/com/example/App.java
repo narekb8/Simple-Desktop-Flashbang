@@ -115,11 +115,10 @@ public class App {
         // OAuth Dev Credentials
 
         OAuth2Credential credentials = new OAuth2Credential
-            ("twitch", "hl8584yn6jxdmrk618813xgymzq5ty");
+            ("twitch", "------------------------------");
         
         TwitchClient twitchClient = TwitchClientBuilder.builder()
             .withClientId("4ocquuv1wpfordfq04za5l7anqch0e")
-            .withClientSecret("iewkws4xqp7anvnzfv5150pddysvx8")
             .withEnableHelix(true)
             .withEnablePubSub(true)
             .build();
