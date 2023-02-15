@@ -1,5 +1,6 @@
 package com.example;
 
+import java.util.Timer;
 import java.util.function.Consumer;
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -41,7 +42,8 @@ class FlashbangConsumer<E> implements Consumer<RewardRedeemedEvent>
             App.afterImage.setVisible(false);
             App.f.setVisible(true);
             App.flashToggle = true;
-            App.startFlash();   
+            App.timer = new Timer();
+            App.startFlashTwitch();   
         }         
     }
 }
