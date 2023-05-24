@@ -4,18 +4,19 @@ import java.util.Timer;
 import java.util.function.Consumer;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import com.github.twitch4j.pubsub.events.RewardRedeemedEvent;
+
+import com.github.twitch4j.chat.events.channel.CheerEvent;
 
 /*
- * Consumer Class for Channel Point Redemptions
+ * Consumer Class for Bit Donations
  * Performs the same functions as the startFlash() function in the main App class, but slightly cut down
  */
 
-class FlashbangConsumer<E> implements Consumer<RewardRedeemedEvent>
+class FlashbangBitConsumer<E> implements Consumer<CheerEvent>
 {
     @Override
-    public void accept(RewardRedeemedEvent t) {
-        if(t.getRedemption().getReward().getId().equals(App.flashbangID))
+    public void accept(CheerEvent t) {
+        if(t.getBits() >= 100)
         {
             App.f.add(App.can);
             App.timer.cancel();
