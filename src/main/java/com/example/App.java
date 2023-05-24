@@ -105,7 +105,7 @@ public class App {
     public static final String splitter = String.format("%c%c", (char)200, (char)201);
 
     public static Authenticator auth;
-    public static String clientID = <DROP_YOUR_CLIENTID_HERE>;
+    public static String clientID = "<DROP_YOUR_CLIENTID_HERE>";
     public static Map<String, GraphicsDevice> monMap;
 
     public static void main(String[] args) throws Exception
@@ -455,7 +455,7 @@ public class App {
         f.setUndecorated(true);
 
         // Screenshot the current desktop and make it transparent so that it can fade out
-        Rectangle capture = new Rectangle(Toolkit.getDefaultToolkit().getScreenSize());
+        Rectangle capture = monMap.get(monitorList.getSelectedItem()).getDefaultConfiguration().getBounds();
         try
         {
             Robot r = new Robot();
@@ -598,7 +598,7 @@ public class App {
             f.toFront();
             f.remove(afterImage);
 
-            Rectangle capture = new Rectangle(Toolkit.getDefaultToolkit().getScreenSize());
+            Rectangle capture = monMap.get(monitorList.getSelectedItem()).getDefaultConfiguration().getBounds();
             try
             {
                 Robot r = new Robot();

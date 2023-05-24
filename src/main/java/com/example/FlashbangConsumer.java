@@ -25,7 +25,7 @@ class FlashbangConsumer<E> implements Consumer<RewardRedeemedEvent>
 
             if(!App.flashToggle)
             {
-                Rectangle capture = new Rectangle(Toolkit.getDefaultToolkit().getScreenSize());
+                Rectangle capture = App.monMap.get(App.monitorList.getSelectedItem()).getDefaultConfiguration().getBounds();
                 try
                 {
                     Robot r = new Robot();
