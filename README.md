@@ -18,3 +18,5 @@ After hitting allow, the program should load all the information in. Make sure t
 Settings will save when closing the program as long as the program isn't actively listening for/generating flashbangs.
 
 ### Slight warning, I haven't tried using it with gifted subs at all. All I can say is good luck.
+
+[Download the .jar here](https://github.com/narekb8/Simple-Desktop-Flashbang/releases/tag/v1.0.0)
