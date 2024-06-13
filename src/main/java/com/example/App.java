@@ -448,7 +448,7 @@ public class App {
     {
         // Will generate random time until next flash using a normal distribution
         // Uses a mean of 7.5 minutes and standard deviation of 3
-        tillNext = rand.nextGaussian()*3+4.5;
+        tillNext = rand.nextGaussian()*1.5+4.5;
 
         // Dispose of any potential leftover objects
         timer.cancel();
@@ -615,7 +615,7 @@ public class App {
     {
         public void run()
         {
-            tillNext = rand.nextGaussian()*3+7.5;
+            tillNext = rand.nextGaussian()*1.5+4.5;
             f.toFront();
             f.setOpacity(1);
             f.remove(afterImage);
