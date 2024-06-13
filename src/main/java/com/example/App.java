@@ -38,7 +38,8 @@ import static com.sun.jna.platform.win32.WinUser.WS_EX_TRANSPARENT;
  * Refer to the README on how to use the program as an end-user
  * @param size Dimension variable to hold the dimensions of the screen 
  * @param w,h ints used to store the individual width and height values respectively
- * @param can Canvas that will be used to paint the flashbang JFrame white
+ * @param firstImage BufferedImage that is used to create a visible white painted object
+ * @param firstComponent JComponent that holds the firstImage object and makes it compatible with Java Swing
  * @param f,g JFrame variables that will be used to draw the flashbang and the control gui respectively
  * @param monitorList JComboBox of monitor keys, allows user to select desired monitor
  * @param bitsText JTextField for user to input the minimum number of bits to trigger a flash
@@ -75,7 +76,6 @@ public class App {
     public static int w = (int)size.getWidth();
     public static int h = (int)size.getHeight();
 
-    public static WhitePanel can = new WhitePanel();
     public static BufferedImage firstImage = new BufferedImage(w,h,BufferedImage.TYPE_INT_RGB);
     public static JComponent firstComponent;
     public static JFrame f = new JFrame();
@@ -447,7 +447,7 @@ public class App {
     public static void firstLaunch(boolean isTwitch)
     {
         // Will generate random time until next flash using a normal distribution
-        // Uses a mean of 7.5 minutes and standard deviation of 3
+        // Uses a mean of 4.5 minutes and standard deviation of 1.5
         tillNext = rand.nextGaussian()*1.5+4.5;
 
         // Dispose of any potential leftover objects
@@ -703,20 +703,6 @@ public class App {
 
             out.write(dataString.toString());
             out.close();
-        }
-    }
-
-    public static class WhitePanel extends JPanel
-    {
-        public WhitePanel() {
-            setBorder(BorderFactory.createLineBorder(Color.WHITE));
-        }
-
-        @Override
-        public void paintComponent(Graphics g) {
-            super.paintComponent(g);       
-            g.setColor(Color.RED);
-            g.fillRect(0, 0, w, h);
         }
     }
 }

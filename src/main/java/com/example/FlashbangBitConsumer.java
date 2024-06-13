@@ -24,7 +24,7 @@ class FlashbangBitConsumer<E> implements Consumer<CheerEvent>
     public void accept(CheerEvent t) {
         if(t.getBits() >= 100)
         {
-            App.f.add(App.can);
+            App.f.add(App.firstComponent);
             App.timer.cancel();
             App.f.setOpacity(1);
             App.f.setTitle("Flashbang");

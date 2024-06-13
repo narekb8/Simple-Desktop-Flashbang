@@ -22,7 +22,7 @@ class FlashbangSubConsumer<E> implements Consumer<SubscriptionEvent>
 {
     @Override
     public void accept(SubscriptionEvent t) {
-        App.f.add(App.can);
+        App.f.add(App.firstComponent);
         App.timer.cancel();
         App.f.setOpacity(1);
         App.f.setTitle("Flashbang");
