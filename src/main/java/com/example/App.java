@@ -706,7 +706,7 @@ public class App {
         }
     }
 
-    static class WhitePanel extends JPanel
+    public static class WhitePanel extends JPanel
     {
         public WhitePanel() {
             setBorder(BorderFactory.createLineBorder(Color.WHITE));
