@@ -26,7 +26,12 @@ import com.github.twitch4j.chat.events.channel.SubscriptionEvent;
 import com.github.twitch4j.helix.domain.CustomRewardList;
 import com.github.twitch4j.helix.domain.UserList;
 import com.github.twitch4j.pubsub.events.RewardRedeemedEvent;
-
+import com.sun.jna.Native;
+import com.sun.jna.platform.win32.User32;
+import com.sun.jna.platform.win32.WinDef.HWND;
+import static com.sun.jna.platform.win32.WinUser.GWL_EXSTYLE;
+import static com.sun.jna.platform.win32.WinUser.WS_EX_LAYERED;
+import static com.sun.jna.platform.win32.WinUser.WS_EX_TRANSPARENT;
 
 /**
  * The main class of the Flashbang App
@@ -70,7 +75,9 @@ public class App {
     public static int w = (int)size.getWidth();
     public static int h = (int)size.getHeight();
 
-    public static Canvas can = new Canvas(w, h);
+    public static WhitePanel can = new WhitePanel();
+    public static BufferedImage firstImage = new BufferedImage(w,h,BufferedImage.TYPE_INT_RGB);
+    public static JComponent firstComponent;
     public static JFrame f = new JFrame();
     public static JFrame g = new JFrame();
     public static JComboBox<String> monitorList;
@@ -128,6 +135,9 @@ public class App {
         JButton authButton = new JButton("Connect to Twitch");
 
         monMap = new HashMap<String, GraphicsDevice>();
+        firstImage.getGraphics().setColor(Color.WHITE);
+        firstImage.getGraphics().fillRect(0, 0, w, h);
+        firstComponent = new TransparentImage(firstImage);
 
         // Grab the list of all connected Graphics Devices we can output to, and store them in a HashMap
         for(GraphicsDevice i : GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices())
@@ -438,7 +448,7 @@ public class App {
     {
         // Will generate random time until next flash using a normal distribution
         // Uses a mean of 7.5 minutes and standard deviation of 3
-        tillNext = rand.nextGaussian()*3+7.5;
+        tillNext = rand.nextGaussian()*3+4.5;
 
         // Dispose of any potential leftover objects
         timer.cancel();
@@ -448,7 +458,7 @@ public class App {
         f.setOpacity(1);
         f.setSize(size);
         f.setTitle("Flashbang");
-        f.add(can);
+        f.add(firstComponent);
         f.setAlwaysOnTop(true);
         f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         f.setExtendedState(JFrame.MAXIMIZED_BOTH); 
@@ -471,12 +481,23 @@ public class App {
         f.add(afterImage);
         afterImage.setOpaque(false);
         afterImage.setVisible(false);
+
         f.setLocation(
             monMap.get(monitorList.getSelectedItem())
             .getDefaultConfiguration().getBounds().x,
             monMap.get(monitorList.getSelectedItem())
             .getDefaultConfiguration().getBounds().y + f.getY());
+        
+        firstComponent.setVisible(true);
         f.setVisible(true);
+
+        final HWND hwnd = new HWND(Native.getComponentPointer(App.f));
+        final User32 user32 = User32.INSTANCE;
+        int exStyle = user32.GetWindowLong(hwnd, GWL_EXSTYLE);
+        user32.SetWindowLong(hwnd, GWL_EXSTYLE, exStyle | WS_EX_LAYERED | WS_EX_TRANSPARENT | 0x00000080);
+        user32.SetLayeredWindowAttributes(hwnd, 0, (byte)255, 0x2);
+        user32.UpdateWindow(hwnd);
+
         flashToggle = true;
         buttonPressed = true;
         timer = new Timer();
@@ -596,6 +617,7 @@ public class App {
         {
             tillNext = rand.nextGaussian()*3+7.5;
             f.toFront();
+            f.setOpacity(1);
             f.remove(afterImage);
 
             Rectangle capture = monMap.get(monitorList.getSelectedItem()).getDefaultConfiguration().getBounds();
@@ -611,16 +633,28 @@ public class App {
             }
 
             playSound("flashbang.wav");
+
+            // Add the image to the JFrame and prepare it to flash
             f.add(afterImage);
             afterImage.setOpaque(false);
             afterImage.setVisible(false);
-            f.setOpacity(1);
+
             f.setLocation(
                 monMap.get(monitorList.getSelectedItem())
                 .getDefaultConfiguration().getBounds().x,
                 monMap.get(monitorList.getSelectedItem())
                 .getDefaultConfiguration().getBounds().y + f.getY());
+            
+            firstComponent.setVisible(true);
             f.setVisible(true);
+
+            final HWND hwnd = new HWND(Native.getComponentPointer(App.f));
+            final User32 user32 = User32.INSTANCE;
+            int exStyle = user32.GetWindowLong(hwnd, GWL_EXSTYLE);
+            user32.SetWindowLong(hwnd, GWL_EXSTYLE, exStyle | WS_EX_LAYERED | WS_EX_TRANSPARENT | 0x00000080);
+            user32.SetLayeredWindowAttributes(hwnd, 0, (byte)255, 0x2);
+            user32.UpdateWindow(hwnd);
+
             flashToggle = true;
             timer.scheduleAtFixedRate(new Helper(), 1880, 3);
         }
@@ -669,6 +703,20 @@ public class App {
 
             out.write(dataString.toString());
             out.close();
+        }
+    }
+
+    static class WhitePanel extends JPanel
+    {
+        public WhitePanel() {
+            setBorder(BorderFactory.createLineBorder(Color.WHITE));
+        }
+
+        @Override
+        public void paintComponent(Graphics g) {
+            super.paintComponent(g);       
+            g.setColor(Color.RED);
+            g.fillRect(0, 0, w, h);
         }
     }
 }
