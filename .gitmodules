@@ -1,0 +1,3 @@
+[submodule "lib/Java-Twitch-Api-Wrapper"]
+	path = lib/Java-Twitch-Api-Wrapper
+	url = https://github.com/urgrue/Java-Twitch-Api-Wrapper.git
