@@ -23,7 +23,7 @@ Settings will save when closing the program as long as the program isn't activel
 
 ### Slight warning, I haven't tried using it with gifted subs at all. All I can say is good luck.
 
-[Download the .jar here](https://github.com/narekb8/Simple-Desktop-Flashbang/releases/download/v1.1.0/Simple-Desktop-Flashbang.jar)
+[Download the .jar here](https://github.com/narekb8/Simple-Desktop-Flashbang/releases/download/v1.1.1/Simple-Desktop-Flashbang.jar)
 
 ## Special Credits / Shoutouts
 
